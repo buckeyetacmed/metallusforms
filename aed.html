@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Metallus &#8212; Buckeye TacMed - AED Inspection</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0d1b2a;--navy2:#1a2d42;--red:#c0392b;--red2:#e74c3c;--gold:#d4a017;--gold2:#f0b429;--white:#f5f0e8;--muted:#8a96a3;--border:rgba(212,160,23,0.25);--input-bg:rgba(255,255,255,0.04);--green:#1e7d45;--amber:#b7770d;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--navy);color:var(--white);font-family:'Barlow',sans-serif;font-weight:300;min-height:100vh;}
+.site-header{background:var(--navy2);border-bottom:2px solid var(--gold);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+.header-left{display:flex;align-items:center;gap:12px;}
+.header-right{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);}
+.site-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;letter-spacing:0.08em;text-transform:uppercase;color:var(--white);}
+.site-name span{color:var(--gold);}
+.wrap{max-width:560px;margin:0 auto;padding:24px 16px 80px;}
+.section-head{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.field-block{margin-bottom:26px;}
+label{display:block;font-size:12px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;}
+input[type="text"],input[type="date"],textarea,select{width:100%;background:var(--input-bg);border:1px solid rgba(255,255,255,0.12);border-radius:5px;color:var(--white);font-family:'Barlow',sans-serif;font-size:15px;padding:10px 14px;outline:none;transition:border-color 0.2s;-webkit-appearance:none;}
+input[type="text"]:focus,input[type="date"]:focus,textarea:focus,select:focus{border-color:var(--gold);}
+select option{background:var(--navy2);color:var(--white);}
+textarea{resize:vertical;min-height:80px;line-height:1.6;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.field-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+
+/* Progress */
+.progress-wrap{background:rgba(255,255,255,0.06);border-radius:4px;height:6px;margin-bottom:6px;overflow:hidden;}
+.progress-bar{height:6px;background:var(--gold);border-radius:4px;transition:width 0.3s;}
+.progress-label{font-size:11px;color:var(--muted);text-align:right;margin-bottom:16px;}
+
+/* Check cards */
+.check-card{background:var(--input-bg);border:1px solid rgba(255,255,255,0.07);border-radius:6px;padding:13px 14px;margin-bottom:8px;transition:border-color 0.15s;}
+.check-card.pass{border-color:var(--green);background:rgba(30,125,69,0.08);}
+.check-card.fail{border-color:var(--red);background:rgba(192,57,43,0.1);}
+.check-top{display:flex;align-items:flex-start;gap:12px;}
+.check-info{flex:1;}
+.check-name{font-size:13px;color:var(--white);line-height:1.4;font-weight:400;}
+.check-sub{font-size:10px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;margin-top:2px;}
+.pf-row{display:flex;gap:4px;flex-shrink:0;}
+.pf-btn{width:52px;height:28px;border:1px solid rgba(255,255,255,0.15);border-radius:4px;background:transparent;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.04em;color:var(--muted);transition:all 0.15s;}
+.pf-btn.pass-active{background:var(--green);border-color:var(--green);color:#fff;}
+.pf-btn.fail-active{background:var(--red);border-color:var(--red);color:#fff;}
+
+/* Fail expand */
+.fail-expand{display:none;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.07);}
+.check-card.fail .fail-expand{display:block;}
+.fail-expand label{font-size:11px;margin-bottom:5px;}
+.fail-expand input[type="text"]{font-size:13px;padding:7px 10px;margin-bottom:8px;}
+.item-photo-row{display:flex;align-items:center;gap:8px;}
+.item-photo-btn{background:transparent;border:1px dashed rgba(212,160,23,0.5);color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.05em;border-radius:4px;padding:5px 10px;cursor:pointer;white-space:nowrap;}
+.item-thumb-row{display:flex;gap:5px;flex-wrap:wrap;}
+.item-thumb{position:relative;width:50px;height:50px;border-radius:4px;overflow:hidden;border:1px solid var(--border);}
+.item-thumb img{width:100%;height:100%;object-fit:cover;}
+.item-thumb-rm{position:absolute;top:1px;right:1px;width:16px;height:16px;background:rgba(192,57,43,0.9);border:none;border-radius:50%;color:#fff;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;}
+
+/* Expiry input */
+.exp-input{width:100%;padding:7px 10px;font-size:13px;background:var(--input-bg);border:1px solid rgba(255,255,255,0.15);border-radius:4px;color:var(--white);}
+.exp-input.expired{border-color:var(--red);color:#e74c3c;}
+.exp-input.expiring{border-color:var(--amber);color:var(--gold2);}
+.exp-row-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;}
+.exp-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;}
+.exp-status{font-size:10px;margin-top:3px;}
+.exp-status.expired{color:#e74c3c;}
+.exp-status.expiring{color:var(--gold2);}
+.exp-status.ok{color:var(--green);}
+
+/* Indicator lights */
+.light-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;}
+.light-btn{flex:1;min-width:80px;padding:8px 6px;border:1px solid rgba(255,255,255,0.15);border-radius:5px;background:transparent;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;cursor:pointer;text-align:center;transition:all 0.15s;}
+.light-btn.ready{background:rgba(30,125,69,0.2);border-color:var(--green);color:#2ecc71;}
+.light-btn.service{background:rgba(192,57,43,0.2);border-color:var(--red);color:#e74c3c;}
+.light-btn.no-light{background:rgba(183,119,13,0.2);border-color:var(--amber);color:var(--gold2);}
+
+/* Rescue kit items */
+.rescue-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;}
+.rescue-item{display:flex;align-items:center;gap:8px;background:var(--input-bg);border:1px solid rgba(255,255,255,0.07);border-radius:5px;padding:9px 12px;cursor:pointer;transition:all 0.15s;}
+.rescue-item.checked{border-color:var(--green);background:rgba(30,125,69,0.08);}
+.rescue-item.missing{border-color:var(--red);background:rgba(192,57,43,0.08);}
+.rescue-check{width:18px;height:18px;border:1.5px solid rgba(255,255,255,0.2);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;}
+.rescue-item.checked .rescue-check{background:var(--green);border-color:var(--green);color:#fff;}
+.rescue-item.missing .rescue-check{background:var(--red);border-color:var(--red);color:#fff;}
+.rescue-name{font-size:12px;color:var(--white);}
+
+/* Photos */
+.photo-upload-area{border:2px dashed rgba(212,160,23,0.4);border-radius:8px;padding:22px 16px;text-align:center;cursor:pointer;transition:border-color 0.2s;margin-bottom:12px;position:relative;}
+.photo-upload-area:hover{border-color:var(--gold);}
+.photo-upload-area input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.photo-upload-icon{font-size:28px;margin-bottom:8px;}
+.photo-upload-label{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;color:var(--gold);letter-spacing:0.06em;text-transform:uppercase;}
+.photo-upload-sub{font-size:12px;color:var(--muted);margin-top:4px;}
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;}
+.photo-thumb-g{position:relative;aspect-ratio:1;border-radius:6px;overflow:hidden;background:var(--navy2);border:1px solid var(--border);}
+.photo-thumb-g img{width:100%;height:100%;object-fit:cover;}
+.photo-remove-g{position:absolute;top:4px;right:4px;width:22px;height:22px;background:rgba(192,57,43,0.9);border:none;border-radius:50%;color:#fff;font-size:12px;cursor:pointer;}
+.photo-count{font-size:12px;color:var(--muted);text-align:right;margin-top:4px;}
+
+/* Verdict */
+.verdict-box{border-radius:8px;padding:16px 20px;margin-bottom:20px;text-align:center;border:2px solid rgba(255,255,255,0.1);}
+.verdict-pass{border-color:var(--green);background:rgba(30,125,69,0.1);}
+.verdict-fail{border-color:var(--red);background:rgba(192,57,43,0.12);}
+.verdict-label{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;}
+.verdict-pass .verdict-label{color:#2ecc71;}
+.verdict-fail .verdict-label{color:#e74c3c;}
+.verdict-sub{font-size:13px;color:var(--muted);margin-top:6px;}
+
+/* Submit */
+.submit-btn{width:100%;background:var(--red);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;border:none;border-radius:6px;padding:16px;cursor:pointer;}
+.submit-btn:hover{background:var(--red2);}
+.submit-btn:disabled{background:#444;cursor:not-allowed;}
+.required-note{font-size:12px;color:var(--muted);text-align:center;margin-top:10px;}
+.hint{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5;}
+
+/* Setup */
+.setup-card{background:var(--navy2);border:1px solid var(--border);border-radius:6px;padding:14px 16px;margin-bottom:12px;}
+.step-num{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:var(--gold);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px;}
+.step-text{font-size:13px;color:var(--white);line-height:1.6;}
+.step-text code{background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:3px;font-family:monospace;font-size:12px;color:#7ecfff;}
+.script-box{background:#0a1520;border:1px solid var(--border);border-radius:6px;padding:14px 16px;font-family:monospace;font-size:11px;color:#7ecfff;white-space:pre-wrap;word-break:break-all;margin-bottom:10px;max-height:200px;overflow-y:auto;}
+.copy-btn{background:var(--gold);color:var(--navy);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;border:none;border-radius:5px;padding:8px 18px;cursor:pointer;margin-bottom:20px;}
+.url-input-row{display:flex;gap:10px;margin-top:12px;}
+.url-input-row input{flex:1;}
+.save-url-btn{background:var(--gold);color:var(--navy);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;border:none;border-radius:5px;padding:0 18px;cursor:pointer;white-space:nowrap;}
+.qr-intro{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:20px;background:var(--navy2);border-left:3px solid var(--gold);padding:12px 16px;border-radius:0 6px 6px 0;}
+
+/* Nav */
+.nav-tabs{display:flex;border-bottom:1px solid var(--border);background:var(--navy2);}
+.nav-tab{flex:1;padding:11px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:color 0.2s,border-color 0.2s;margin-bottom:-1px;}
+.nav-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.spin{display:inline-block;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+
+
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-left">
+    <img src="data:image/png;base64,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" alt="Buckeye TacMed" style="height:38px;width:auto;flex-shrink:0;" />
+    <div class="site-name">Buckeye <span>TacMed</span></div>
+  </div>
+  <div class="header-right">AED Inspection</div>
+</header>
+
+<div class="nav-tabs" id="navTabs">
+  <div class="nav-tab active" onclick="switchTab('form')">Inspection</div>
+  
+</div>
+
+
+
+<!-- FORM -->
+<div id="page-form">
+<div class="wrap">
+
+  <!-- INFO -->
+  <div class="field-block">
+    <div class="section-head">AED Information</div>
+    <label>AED Location *</label>
+    <input type="text" id="aedLocation" placeholder="e.g. Building A - Main Lobby" style="margin-bottom:8px;" />
+    <div style="margin-top:8px;margin-bottom:12px;">
+      <label style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;display:block;margin-bottom:6px;">Google Maps Pin URL (optional)</label>
+      <input type="text" id="mapPinUrl" placeholder="Paste Google Maps URL to pin this station location" style="margin-bottom:4px;" oninput="updateMapLink()" />
+      <div id="mapLinkPreview" style="display:none;margin-top:4px;">
+        <a id="mapLink" href="#" target="_blank" rel="noopener" style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.06em;color:var(--gold);text-decoration:none;display:inline-flex;align-items:center;gap:6px;">&#x1F4CD; View Station on Map &#x2192;</a>
+      </div>
+    </div>
+    <div class="field-row" style="margin-bottom:12px;">
+      <div>
+        <label>AED Model</label>
+        <input type="text" id="aedModel" placeholder="e.g. Philips HeartStart" />
+      </div>
+      <div>
+        <label>Serial Number</label>
+        <input type="text" id="aedSerial" placeholder="e.g. A12345" />
+      </div>
+    </div>
+    <div class="field-row">
+      <div>
+        <label>Inspector Name *</label>
+        <input type="text" id="inspectorName" placeholder="Full name" />
+      </div>
+      <div>
+        <label>Inspection Date</label>
+        <input type="text" id="inspectDate" readonly style="color:var(--muted);" />
+      </div>
+    </div>
+  </div>
+
+  <!-- CHECKLIST -->
+  <div class="field-block">
+    <div class="section-head">Inspection Checklist</div>
+    <div class="progress-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+    <div class="progress-label" id="progressLabel">0 of 0 items checked</div>
+    <div id="checkContainer"></div>
+  </div>
+
+  <!-- PADS & BATTERY EXPIRY -->
+  <div class="field-block">
+    <div class="section-head">Consumable Expiration Dates</div>
+    <div class="exp-row-grid">
+      <div>
+        <div class="exp-label">Pad / Electrode Expiration</div>
+        <input type="date" class="exp-input" id="padExp" onchange="checkExpDate('padExp','padExpStatus')" />
+        <div class="exp-status" id="padExpStatus"></div>
+      </div>
+      <div>
+        <div class="exp-label">Battery Expiration</div>
+        <input type="date" class="exp-input" id="batExp" onchange="checkExpDate('batExp','batExpStatus')" />
+        <div class="exp-status" id="batExpStatus"></div>
+      </div>
+    </div>
+    <div class="hint" style="margin-top:10px;">Items expiring within 90 days will be flagged. Expired items require immediate replacement before the AED is considered operational.</div>
+  </div>
+
+  <!-- RESCUE KIT -->
+  <div class="field-block">
+    <div class="section-head">Rescue Kit Contents</div>
+    <div class="hint" style="margin-bottom:10px;">Tap each item to mark as present. Tap again to mark missing.</div>
+    <div class="rescue-grid" id="rescueGrid"></div>
+  </div>
+
+  <!-- NOTES -->
+  <div class="field-block">
+    <div class="section-head">Inspector Notes</div>
+    <label>Corrective actions / items ordered / follow-up required</label>
+    <textarea id="inspectorNotes" placeholder="Document deficiencies, parts ordered, or actions taken..."></textarea>
+  </div>
+
+  <!-- PHOTOS -->
+  <div class="field-block">
+    <div class="section-head">Photo Documentation</div>
+    <div class="photo-upload-area" id="photoArea">
+      <input type="file" id="photoInput" accept="image/*" multiple onchange="handlePhotos(this.files)" />
+      <div class="photo-upload-icon">&#x1F4F7;</div>
+      <div class="photo-upload-label">Tap to add photos</div>
+      <div class="photo-upload-sub">Document AED condition or deficiencies (up to 10)</div>
+    </div>
+    <div class="photo-grid" id="photoGrid"></div>
+    <div class="photo-count" id="photoCount"></div>
+  </div>
+
+  <!-- VERDICT -->
+  <div class="field-block">
+    <div class="section-head">Inspection Result</div>
+    <div class="verdict-box" id="verdictBox">
+      <div class="verdict-label" id="verdictLabel">Complete checklist above</div>
+      <div class="verdict-sub" id="verdictSub">Mark all items to generate a result</div>
+    </div>
+    <button class="submit-btn" id="submitBtn" onclick="submitInspection()">Submit Inspection</button>
+    <div class="required-note">Logs to your dedicated AED Inspection Google Sheet</div>
+  </div>
+
+</div>
+</div>
+
+<!-- SUCCESS -->
+<div id="page-success" style="display:none;">
+  <div style="max-width:460px;margin:60px auto;padding:0 20px;text-align:center;">
+    <div id="successIcon" style="width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:32px;"></div>
+    <div id="successTitle" style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:8px;"></div>
+    <div id="successSub" style="font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:24px;"></div>
+    <div id="successSummary" style="background:var(--navy2);border:1px solid var(--border);border-radius:8px;padding:16px 20px;text-align:left;margin-bottom:24px;font-size:13px;line-height:1.8;"></div>
+    <button onclick="resetForm()" style="background:transparent;border:1.5px solid var(--gold);color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:12px 28px;border-radius:6px;cursor:pointer;">New Inspection</button>
+    <a href="https://buckeyetacmed.github.io/metallus-portal/" style="display:block;margin-top:12px;background:transparent;border:1.5px solid var(--gold);color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:13px;border-radius:6px;cursor:pointer;text-align:center;text-decoration:none;">&#x2190; Return to Portal</a>
+  </div>
+</div>
+
+<!-- SETUP -->
+
+
+<script>
+var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzaiyR4647cy5vws9WWzj2a3S80oGFeeAiOmVod1ktj6ubhq7PokLcbFgKGMfn0IoGUVA/exec";
+var checkState = {};
+var rescueState = {};
+var photos = [];
+
+var CHECKS = [
+  {id:"c1", name:"AED unit is present and accessible",          sub:"Unit is in its designated location and accessible within 3 minutes of any area"},
+  {id:"c2", name:"AED unit exterior is undamaged",              sub:"No cracks, damage, or signs of tampering to the unit housing"},
+  {id:"c3", name:"Cabinet / case is undamaged and functional",  sub:"Cabinet opens properly, latch works, no damage &#8212; alarm functional if applicable"},
+  {id:"c4", name:"Indicator / status light shows READY",        sub:"Green or flashing ready light confirms unit has passed self-test. Any other light = FAIL"},
+  {id:"c5", name:"Pads / electrodes are present and sealed",    sub:"Pads package is intact, unopened, and properly connected to the unit"},
+  {id:"c6", name:"Battery is installed and secure",             sub:"Battery is properly seated and secure in the unit"},
+  {id:"c7", name:"AED signage is visible and unobstructed",     sub:"Location sign is clearly visible from a distance with no obstructions"},
+  {id:"c8", name:"Clear unobstructed path to AED",             sub:"No furniture, equipment, or obstacles blocking access to the unit"},
+];
+
+var RESCUE_ITEMS = [
+  {id:"r1", name:"Nitrile gloves (pair)"},
+  {id:"r2", name:"Razor / shave prep"},
+  {id:"r3", name:"Gauze / absorbent pad"},
+  {id:"r4", name:"Scissors"},
+  {id:"r5", name:"CPR face shield / mask"},
+  {id:"r6", name:"Towel / cloth"},
+];
+
+function init() {
+  var now = new Date();
+  document.getElementById("inspectDate").value =
+    now.toLocaleDateString("en-US",{weekday:"short",year:"numeric",month:"short",day:"numeric"});
+  // scriptUrlInput removed - clients now managed via Client Management
+  buildChecklist();
+  buildRescueKit();
+}
+
+function buildChecklist() {
+  var container = document.getElementById("checkContainer");
+  container.innerHTML = "";
+  checkState = {};
+
+  CHECKS.forEach(function(check) {
+    checkState[check.id] = {status:"none", note:"", photos:[]};
+
+    var card = document.createElement("div");
+    card.className = "check-card";
+    card.setAttribute("data-id", check.id);
+
+    var top = document.createElement("div");
+    top.className = "check-top";
+
+    var info = document.createElement("div");
+    info.className = "check-info";
+    var nm = document.createElement("div"); nm.className="check-name"; nm.textContent=check.name; info.appendChild(nm);
+    var sub = document.createElement("div"); sub.className="check-sub"; sub.textContent=check.sub; info.appendChild(sub);
+    top.appendChild(info);
+
+    var pfRow = document.createElement("div");
+    pfRow.className = "pf-row";
+    var bPass = document.createElement("button"); bPass.className="pf-btn"; bPass.textContent="PASS";
+    var bFail = document.createElement("button"); bFail.className="pf-btn"; bFail.textContent="FAIL";
+
+    function setStatus(val) {
+      checkState[check.id].status = val;
+      card.className = "check-card " + val;
+      bPass.className = "pf-btn" + (val==="pass"?" pass-active":"");
+      bFail.className = "pf-btn" + (val==="fail"?" fail-active":"");
+      updateProgress();
+      updateVerdict();
+    }
+    bPass.addEventListener("click", function(){ setStatus("pass"); });
+    bFail.addEventListener("click", function(){ setStatus("fail"); });
+    pfRow.appendChild(bPass); pfRow.appendChild(bFail);
+    top.appendChild(pfRow);
+    card.appendChild(top);
+
+    // Fail expand with note + photo
+    var expand = document.createElement("div");
+    expand.className = "fail-expand";
+    var expLbl = document.createElement("label"); expLbl.textContent="Note on deficiency"; expand.appendChild(expLbl);
+    var expInput = document.createElement("input"); expInput.type="text"; expInput.placeholder="Describe the issue...";
+    expInput.addEventListener("input", function(){ checkState[check.id].note=expInput.value; });
+    expand.appendChild(expInput);
+
+    var photoRow = document.createElement("div"); photoRow.className="item-photo-row";
+    var photoBtn = document.createElement("button"); photoBtn.className="item-photo-btn"; photoBtn.textContent="+ Photo";
+    var photoInput = document.createElement("input"); photoInput.type="file"; photoInput.accept="image/*"; photoInput.multiple=true; photoInput.style.display="none";
+    var thumbRow = document.createElement("div"); thumbRow.className="item-thumb-row";
+    photoBtn.addEventListener("click", function(){ photoInput.click(); });
+    photoInput.addEventListener("change", function() {
+      for (var pi=0; pi<photoInput.files.length; pi++) {
+        if (checkState[check.id].photos.length>=3) break;
+        (function(file, cid, tr){
+          var reader=new FileReader();
+          reader.onload=function(e){
+            checkState[cid].photos.push(e.target.result);
+            renderItemThumbs(cid,tr);
+          };
+          reader.readAsDataURL(file);
+        })(photoInput.files[pi], check.id, thumbRow);
+      }
+      photoInput.value="";
+    });
+    photoRow.appendChild(photoBtn); photoRow.appendChild(photoInput); photoRow.appendChild(thumbRow);
+    expand.appendChild(photoRow);
+    card.appendChild(expand);
+    container.appendChild(card);
+  });
+  updateProgress();
+  updateVerdict();
+}
+
+function renderItemThumbs(cid, container) {
+  container.innerHTML="";
+  checkState[cid].photos.forEach(function(src,idx){
+    var thumb=document.createElement("div"); thumb.className="item-thumb";
+    var img=document.createElement("img"); img.src=src; thumb.appendChild(img);
+    var rm=document.createElement("button"); rm.className="item-thumb-rm"; rm.textContent="x";
+    rm.onclick=function(e){e.stopPropagation();checkState[cid].photos.splice(idx,1);renderItemThumbs(cid,container);};
+    thumb.appendChild(rm); container.appendChild(thumb);
+  });
+}
+
+function buildRescueKit() {
+  var grid = document.getElementById("rescueGrid");
+  grid.innerHTML="";
+  RESCUE_ITEMS.forEach(function(item){
+    rescueState[item.id]="none";
+    var el=document.createElement("div"); el.className="rescue-item"; el.setAttribute("data-rid",item.id);
+    var chk=document.createElement("div"); chk.className="rescue-check"; chk.textContent="";
+    var nm=document.createElement("div"); nm.className="rescue-name"; nm.textContent=item.name;
+    el.appendChild(chk); el.appendChild(nm);
+    el.addEventListener("click", function(){
+      var cur=rescueState[item.id];
+      var next=cur==="none"?"present":cur==="present"?"missing":"present";
+      rescueState[item.id]=next;
+      el.className="rescue-item "+(next==="present"?"checked":next==="missing"?"missing":"");
+      chk.textContent=next==="present"?"&#x2713;":next==="missing"?"&#x2715;":"";
+      chk.innerHTML=next==="present"?"&#x2713;":next==="missing"?"&#x2715;":"";
+      updateVerdict();
+    });
+    grid.appendChild(el);
+  });
+}
+
+function checkExpDate(inputId, statusId) {
+  var input=document.getElementById(inputId);
+  var status=document.getElementById(statusId);
+  if (!input.value){status.textContent="";return;}
+  var days=Math.floor((new Date(input.value)-new Date())/86400000);
+  if (days<0){
+    input.className="exp-input expired";
+    status.className="exp-status expired";
+    status.textContent="EXPIRED "+Math.abs(days)+"d ago - replace immediately";
+  } else if (days<90){
+    input.className="exp-input expiring";
+    status.className="exp-status expiring";
+    status.textContent="Expiring in "+days+" days - plan replacement";
+  } else {
+    input.className="exp-input";
+    status.className="exp-status ok";
+    status.textContent="Good - "+days+" days remaining";
+  }
+  updateVerdict();
+}
+
+function updateProgress() {
+  var done=CHECKS.filter(function(c){ return checkState[c.id]&&checkState[c.id].status!=="none"; }).length;
+  var pct=Math.round(done/CHECKS.length*100);
+  document.getElementById("progressBar").style.width=pct+"%";
+  document.getElementById("progressLabel").textContent=done+" of "+CHECKS.length+" items checked";
+}
+
+function updateVerdict() {
+  var unchecked=CHECKS.filter(function(c){ return checkState[c.id]&&checkState[c.id].status==="none"; }).length;
+  var fails=CHECKS.filter(function(c){ return checkState[c.id]&&checkState[c.id].status==="fail"; }).length;
+  var missingRescue=RESCUE_ITEMS.filter(function(r){ return rescueState[r.id]==="missing"; }).length;
+  var expiredPad=document.getElementById("padExp").value&&Math.floor((new Date(document.getElementById("padExp").value)-new Date())/86400000)<0;
+  var expiredBat=document.getElementById("batExp").value&&Math.floor((new Date(document.getElementById("batExp").value)-new Date())/86400000)<0;
+  var box=document.getElementById("verdictBox");
+  var lbl=document.getElementById("verdictLabel");
+  var sub=document.getElementById("verdictSub");
+  if (unchecked>0){
+    box.className="verdict-box";
+    lbl.textContent=unchecked+" item"+(unchecked>1?"s":"")+" remaining";
+    sub.textContent="Mark all checklist items to generate a result";
+    return;
+  }
+  var totalFails=fails+missingRescue+(expiredPad?1:0)+(expiredBat?1:0);
+  if (totalFails>0){
+    box.className="verdict-box verdict-fail";
+    lbl.textContent="FAIL";
+    var reasons=[];
+    if (fails>0) reasons.push(fails+" checklist item"+(fails>1?"s":"")+" failed");
+    if (missingRescue>0) reasons.push(missingRescue+" rescue kit item"+(missingRescue>1?"s":"")+" missing");
+    if (expiredPad) reasons.push("pads expired");
+    if (expiredBat) reasons.push("battery expired");
+    sub.textContent="AED not operational: "+reasons.join(", ");
+  } else {
+    box.className="verdict-box verdict-pass";
+    lbl.textContent="PASS";
+    sub.textContent="AED is operational and ready for deployment.";
+  }
+}
+
+function submitInspection() {
+  var loc=document.getElementById("aedLocation").value.trim();
+  var name=document.getElementById("inspectorName").value.trim();
+  if (!loc){alert("Please enter AED location.");return;}
+  if (!name){alert("Please enter inspector name.");return;}
+  var unchecked=CHECKS.filter(function(c){ return checkState[c.id].status==="none"; });
+  if (unchecked.length>0){alert("Please mark all checklist items before submitting.");return;}
+
+  var failList=CHECKS.filter(function(c){ return checkState[c.id].status==="fail"; }).map(function(c){
+    var entry=c.name;
+    if (checkState[c.id].note) entry+=" ("+checkState[c.id].note+")";
+    return entry;
+  });
+  var missingRescue=RESCUE_ITEMS.filter(function(r){ return rescueState[r.id]==="missing"; }).map(function(r){ return r.name; });
+  var padExp=document.getElementById("padExp").value||"";
+  var batExp=document.getElementById("batExp").value||"";
+  var expiredPad=padExp&&Math.floor((new Date(padExp)-new Date())/86400000)<0;
+  var expiredBat=batExp&&Math.floor((new Date(batExp)-new Date())/86400000)<0;
+  if (expiredPad) failList.push("Pads EXPIRED ("+padExp+")");
+  if (expiredBat) failList.push("Battery EXPIRED ("+batExp+")");
+  var verdict=failList.length>0||missingRescue.length>0?"FAIL":"PASS";
+
+  var payload={
+    date:document.getElementById("inspectDate").value,
+    location:loc,
+    inspector:name,
+    model:document.getElementById("aedModel").value||"",
+    serial:document.getElementById("aedSerial").value||"",
+    result:verdict,
+    failedItems:failList.join("; ")||"None",
+    missingRescue:missingRescue.join("; ")||"None",
+    padExp:padExp||"Not entered",
+    batExp:batExp||"Not entered",
+    notes:document.getElementById("inspectorNotes").value.trim()||"",
+    photoCount:photos.length,
+    mapUrl: document.getElementById("mapPinUrl") ? document.getElementById("mapPinUrl").value.trim() : ""
+  };
+
+  var btn=document.getElementById("submitBtn");
+  btn.disabled=true;
+  btn.innerHTML="<span class='spin'>&#x27F3;</span> Submitting...";
+
+  
+  var scriptUrl="https://script.google.com/macros/s/AKfycbzaiyR4647cy5vws9WWzj2a3S80oGFeeAiOmVod1ktj6ubhq7PokLcbFgKGMfn0IoGUVA/exec";
+  function onDone(){
+    btn.disabled=false; btn.textContent="Submit Inspection";
+    showSuccess(verdict,payload,failList,missingRescue);
+  }
+  if (scriptUrl){
+    fetch(scriptUrl,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)})
+      .then(function(){ setTimeout(onDone,500); })
+      .catch(function(){ setTimeout(onDone,500); });
+  } else { onDone(); }
+}
+
+function showSuccess(verdict,payload,failList,missingRescue) {
+  var icon=document.getElementById("successIcon");
+  var title=document.getElementById("successTitle");
+  var sub2=document.getElementById("successSub");
+  if (verdict==="PASS"){
+    icon.style.cssText="width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:32px;background:rgba(30,125,69,0.15);border:2px solid #1e7d45;";
+    icon.textContent="\u2713"; title.style.color="#2ecc71"; title.textContent="AED Passed";
+    sub2.textContent="Unit is operational and ready for deployment. Inspection logged.";
+  } else {
+    icon.style.cssText="width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:32px;background:rgba(192,57,43,0.15);border:2px solid #c0392b;";
+    icon.textContent="\u2715"; title.style.color="#e74c3c"; title.textContent="AED Failed";
+    sub2.textContent="Unit is NOT operational. Immediate corrective action required.";
+  }
+  function row(lbl,val){ return "<div style='margin-bottom:8px;'><span style='color:var(--gold);font-family:Barlow Condensed,sans-serif;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:2px;'>"+lbl+"</span><span style='font-size:13px;'>"+val+"</span></div>"; }
+  var html=row("Location",payload.location)+row("Inspector",payload.inspector)+row("Date",payload.date);
+  if (payload.model) html+=row("Model",payload.model+(payload.serial?" | SN: "+payload.serial:""));
+  html+=row("Result",verdict);
+  if (failList.length) html+=row("Failed Items","<span style='color:#e74c3c;'>"+failList.join("<br>")+"</span>");
+  if (missingRescue.length) html+=row("Missing Rescue Items","<span style='color:#e74c3c;'>"+missingRescue.join(", ")+"</span>");
+  if (payload.padExp!=="Not entered") html+=row("Pad Expiration",payload.padExp);
+  if (payload.batExp!=="Not entered") html+=row("Battery Expiration",payload.batExp);
+  if (payload.notes) html+=row("Notes",payload.notes);
+  html+=row("Photos",payload.photoCount+" attached");
+  document.getElementById("successSummary").innerHTML=html;
+  document.getElementById("page-form").style.display="none";
+  document.getElementById("page-success").style.display="block";
+  document.getElementById("navTabs").style.display="none";
+}
+
+function resetForm() {
+  document.getElementById("aedLocation").value="";
+  document.getElementById("aedModel").value="";
+  document.getElementById("aedSerial").value="";
+  document.getElementById("inspectorName").value="";
+  document.getElementById("inspectorNotes").value="";
+  document.getElementById("padExp").value=""; document.getElementById("padExpStatus").textContent="";
+  document.getElementById("batExp").value=""; document.getElementById("batExpStatus").textContent="";
+  document.getElementById("padExp").className="exp-input"; document.getElementById("batExp").className="exp-input";
+  photos=[]; renderPhotos();
+  document.getElementById("photoArea").style.display="block";
+  document.getElementById("submitBtn").disabled=false;
+  document.getElementById("submitBtn").textContent="Submit Inspection";
+  buildChecklist(); buildRescueKit();
+  document.getElementById("page-success").style.display="none";
+  document.getElementById("page-form").style.display="block";
+  document.getElementById("navTabs").style.display="flex";
+}
+
+function handlePhotos(files) {
+  for (var i=0;i<files.length;i++){
+    if (photos.length>=10){alert("Maximum 10 photos.");break;}
+    (function(file){
+      var reader=new FileReader();
+      reader.onload=function(e){ photos.push(e.target.result); renderPhotos(); };
+      reader.readAsDataURL(file);
+    })(files[i]);
+  }
+  document.getElementById("photoInput").value="";
+}
+
+function renderPhotos() {
+  var grid=document.getElementById("photoGrid");
+  grid.innerHTML="";
+  photos.forEach(function(src,idx){
+    var thumb=document.createElement("div"); thumb.className="photo-thumb-g";
+    var img=document.createElement("img"); img.src=src; thumb.appendChild(img);
+    var rm=document.createElement("button"); rm.className="photo-remove-g"; rm.textContent="x";
+    rm.onclick=function(e){e.stopPropagation();photos.splice(idx,1);renderPhotos();};
+    thumb.appendChild(rm); grid.appendChild(thumb);
+  });
+  document.getElementById("photoCount").textContent=photos.length>0?photos.length+" photo"+(photos.length>1?"s":"")+" attached":"";
+  document.getElementById("photoArea").style.display=photos.length>=10?"none":"block";
+}
+
+function saveScriptUrl() {
+  var url=document.getElementById("scriptUrlInput").value.trim();
+  if (!url) return;
+  
+  document.getElementById("urlSaveStatus").textContent="Saved! Inspections will now log to your Google Sheet.";
+}
+
+function copyScript() {
+  navigator.clipboard.writeText(document.getElementById("scriptBox").textContent)
+    .then(function(){ alert("Script copied!"); });
+}
+
+function switchTab(tab) {
+  document.querySelectorAll(".nav-tab").forEach(function(t,i){
+    t.classList.toggle("active",(i===0&&tab==="form"));
+  });
+  document.getElementById("page-form").style.display=tab==="form"?"block":"none";
+  
+  document.getElementById("page-success").style.display="none";
+  if (tab === "form") { }
+  
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function updateMapLink() {
+  var input = document.getElementById('mapPinUrl');
+  var preview = document.getElementById('mapLinkPreview');
+  var link = document.getElementById('mapLink');
+  if (!input||!preview||!link) return;
+  var url = input.value.trim();
+  if (url && (url.indexOf('google.com/maps')>-1||url.indexOf('maps.app.goo.gl')>-1||url.indexOf('goo.gl')>-1)) {
+    link.href = url;
+    preview.style.display = 'block';
+  } else {
+    preview.style.display = 'none';
+  }
+}
+
+window.addEventListener("load", function(){
+  init();
+  // Second pass after short delay to catch any timing issues
+  setTimeout(function(){
+  }, 300);
+});
+</script>
+</body>
+</html>
